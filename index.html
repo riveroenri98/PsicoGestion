@@ -72,40 +72,14 @@
 </head>
 <body class="bg-gray-50 text-gray-800">
 
-    <!-- Vista de Inicio de Sesión -->
+    <!-- Pantalla de Carga -->
     <div id="auth-container" class="min-h-screen flex items-center justify-center bg-gray-100">
-        <div class="max-w-md w-full bg-white p-8 rounded-xl shadow-lg">
-            <div class="text-center mb-8">
-                <svg class="mx-auto h-12 w-auto text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0121 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0112 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 013 12c0-1.605.42-3.113 1.157-4.418" />
-                </svg>
-                <h2 class="mt-6 text-3xl font-bold text-gray-900">PsicoGestión</h2>
-                <p class="mt-2 text-sm text-gray-600">Tu espacio seguro para la gestión de pacientes</p>
-            </div>
-            <form id="login-form" class="space-y-6">
-                <div>
-                    <label for="email" class="text-sm font-medium text-gray-700">Correo Electrónico</label>
-                    <input id="email" name="email" type="email" autocomplete="email" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
-                </div>
-                <div>
-                    <label for="password" class="text-sm font-medium text-gray-700">Contraseña</label>
-                    <input id="password" name="password" type="password" autocomplete="current-password" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
-                </div>
-                <div class="flex items-center justify-end">
-                    <a href="#" id="forgot-password-link" class="text-sm font-medium text-blue-600 hover:text-blue-500">
-                        ¿Olvidaste tu contraseña?
-                    </a>
-                </div>
-                <div id="auth-error" class="text-red-600 text-sm hidden"></div>
-                <div class="flex items-center justify-between gap-4">
-                    <button type="submit" id="login-btn" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                        Iniciar Sesión
-                    </button>
-                    <button type="button" id="register-btn" class="w-full flex justify-center py-2 px-4 border border-blue-600 rounded-md shadow-sm text-sm font-medium text-blue-600 bg-white hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                        Registrarse
-                    </button>
-                </div>
-            </form>
+        <div class="text-center">
+            <svg class="animate-spin h-10 w-10 text-blue-600 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            <p class="mt-4 text-lg text-gray-700">Conectando de forma segura...</p>
         </div>
     </div>
 
@@ -134,12 +108,6 @@
                         Pacientes
                     </a>
                 </nav>
-                <div class="p-4 border-t">
-                     <button id="logout-btn" class="w-full flex items-center justify-center px-4 py-2 text-gray-700 hover:bg-red-100 hover:text-red-700 rounded-md">
-                        <svg class="h-5 w-5 mr-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
-                        Cerrar Sesión
-                    </button>
-                </div>
             </aside>
             
             <!-- Contenido Principal -->
@@ -300,6 +268,18 @@
             </form>
         </div>
     </div>
+    
+    <!-- Modal para Confirmar Borrado de Paciente -->
+    <div id="delete-patient-modal" class="modal-backdrop hidden">
+        <div class="modal-content">
+            <h3 class="text-xl font-semibold mb-2">Confirmar Eliminación</h3>
+            <p class="text-gray-600 mb-4">¿Estás seguro de que quieres eliminar a <strong id="delete-patient-name-confirm"></strong>? Esta acción no se puede deshacer y borrará permanentemente al paciente y todo su historial de sesiones.</p>
+            <div class="mt-6 flex justify-end gap-3">
+                <button type="button" id="cancel-delete-patient-btn" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-300">Cancelar</button>
+                <button type="button" id="confirm-delete-patient-btn" class="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700">Sí, Eliminar</button>
+            </div>
+        </div>
+    </div>
 
 
     <script type="module">
@@ -307,11 +287,8 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { 
             getAuth, 
-            createUserWithEmailAndPassword, 
-            signInWithEmailAndPassword, 
-            signOut, 
             onAuthStateChanged,
-            sendPasswordResetEmail
+            signInAnonymously
         } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { 
             getFirestore,
@@ -326,12 +303,12 @@
             serverTimestamp,
             setDoc,
             updateDoc,
-            where
+            where,
+            deleteDoc
         } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // =================================================================================
         // CONFIGURACIÓN DE FIREBASE
-        // Por favor, pega aquí el objeto de configuración que copiaste de tu proyecto.
         // =================================================================================
         const firebaseConfig = {
           apiKey: "AIzaSyDCZkw7mELc6IRZNa6xtTRh4OvKS6Uclvw",
@@ -353,12 +330,7 @@
         // Referencias a elementos del DOM
         const authContainer = document.getElementById('auth-container');
         const appContainer = document.getElementById('app-container');
-        const loginForm = document.getElementById('login-form');
-        const authError = document.getElementById('auth-error');
-        const registerBtn = document.getElementById('register-btn');
-        const logoutBtn = document.getElementById('logout-btn');
-        const forgotPasswordLink = document.getElementById('forgot-password-link');
-
+        
         const dashboardView = document.getElementById('dashboard-view');
         const calendarView = document.getElementById('calendar-view');
         const patientsView = document.getElementById('patients-view');
@@ -395,6 +367,12 @@
         const editSessionModal = document.getElementById('edit-session-modal');
         const cancelEditSessionBtn = document.getElementById('cancel-edit-session');
         const editSessionForm = document.getElementById('edit-session-form');
+        
+        const deletePatientModal = document.getElementById('delete-patient-modal');
+        const cancelDeletePatientBtn = document.getElementById('cancel-delete-patient-btn');
+        const confirmDeletePatientBtn = document.getElementById('confirm-delete-patient-btn');
+        const deletePatientNameConfirmEl = document.getElementById('delete-patient-name-confirm');
+
 
         let currentUserId = null;
         let patientUnsubscribe = null;
@@ -414,80 +392,19 @@
                 appContainer.classList.remove('hidden');
                 setupRealtimeListeners();
                 navigateTo('dashboard');
-            } else {
-                currentUserId = null;
-                authContainer.classList.remove('hidden');
-                appContainer.classList.add('hidden');
-                cleanupListeners();
             }
         });
 
-        loginForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const email = loginForm.email.value;
-            const password = loginForm.password.value;
+        (async () => {
             try {
-                await signInWithEmailAndPassword(auth, email, password);
-                authError.classList.add('hidden');
+                if (!auth.currentUser) {
+                    await signInAnonymously(auth);
+                }
             } catch (error) {
-                authError.textContent = "Correo o contraseña incorrectos.";
-                authError.classList.remove('hidden');
-                authError.classList.add('text-red-600');
-                authError.classList.remove('text-green-600');
-                console.error("Error de inicio de sesión:", error.message);
+                console.error("Error al iniciar sesión anónimamente:", error);
+                authContainer.innerHTML = `<div class="max-w-md text-center"><p class="text-red-600">Error de autenticación.</p><p class="text-sm text-gray-600 mt-2">Por favor, verifica que la clave de API no tenga restricciones de dominio en la Consola de Google Cloud y recarga la página.</p></div>`;
             }
-        });
-
-        registerBtn.addEventListener('click', async () => {
-            const email = loginForm.email.value;
-            const password = loginForm.password.value;
-            if (!email || !password) {
-                authError.textContent = "Por favor, ingresa correo y contraseña para registrarte.";
-                authError.classList.remove('hidden');
-                return;
-            }
-            try {
-                await createUserWithEmailAndPassword(auth, email, password);
-                authError.classList.add('hidden');
-            } catch (error) {
-                authError.textContent = "Error al registrar. El correo puede estar en uso.";
-                authError.classList.remove('hidden');
-                authError.classList.add('text-red-600');
-                authError.classList.remove('text-green-600');
-                console.error("Error de registro:", error.message);
-            }
-        });
-
-        forgotPasswordLink.addEventListener('click', async (e) => {
-            e.preventDefault();
-            const email = loginForm.email.value;
-            if (!email) {
-                authError.textContent = "Por favor, ingresa tu correo electrónico arriba y luego haz clic aquí.";
-                authError.classList.remove('hidden');
-                authError.classList.add('text-red-600');
-                authError.classList.remove('text-green-600');
-                return;
-            }
-
-            try {
-                await sendPasswordResetEmail(auth, email);
-                authError.textContent = "Se ha enviado un correo para restablecer tu contraseña. Revisa tu bandeja de entrada.";
-                authError.classList.remove('hidden');
-                authError.classList.remove('text-red-600');
-                authError.classList.add('text-green-600');
-            } catch (error) {
-                authError.textContent = "No se pudo enviar el correo. Verifica que la dirección sea correcta.";
-                authError.classList.remove('hidden');
-                authError.classList.add('text-red-600');
-                authError.classList.remove('text-green-600');
-                console.error("Password reset error:", error);
-            }
-        });
-
-
-        logoutBtn.addEventListener('click', () => {
-            signOut(auth);
-        });
+        })();
         
         // --- Navegación ---
         function navigateTo(view) {
@@ -620,9 +537,17 @@
                     Volver a la lista
                 </button>
                 <div class="bg-white p-6 rounded-lg shadow mb-6">
-                    <h2 class="text-3xl font-bold">${patient.name}</h2>
-                    <p class="text-gray-600 mt-1">${patient.email || ''}</p>
-                    <p class="text-gray-600">${patient.phone || ''}</p>
+                     <div class="flex justify-between items-start">
+                        <div>
+                            <h2 class="text-3xl font-bold">${patient.name}</h2>
+                            <p class="text-gray-600 mt-1">${patient.email || ''}</p>
+                            <p class="text-gray-600">${patient.phone || ''}</p>
+                        </div>
+                        <button id="open-delete-modal-btn" data-patient-id="${patient.id}" data-patient-name="${patient.name}" class="bg-red-50 text-red-600 px-4 py-2 rounded-md hover:bg-red-100 flex items-center text-sm">
+                            <svg class="h-4 w-4 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                            Eliminar Paciente
+                        </button>
+                    </div>
                 </div>
                 <div class="flex justify-between items-center mb-4">
                     <h3 class="text-2xl font-bold">Historial de Sesiones</h3>
@@ -636,7 +561,12 @@
             
             document.getElementById('back-to-patients-btn').addEventListener('click', () => navigateTo('patients'));
             document.getElementById('add-session-btn-detail').addEventListener('click', (e) => openAddSessionModal(e.currentTarget.dataset.patientId));
-            
+            document.getElementById('open-delete-modal-btn').addEventListener('click', (e) => {
+                const patientId = e.currentTarget.dataset.patientId;
+                const patientName = e.currentTarget.dataset.patientName;
+                openDeleteConfirmationModal(patientId, patientName);
+            });
+
             navigateTo('patient-detail');
             
             const sessionsPath = `/artifacts/${appId}/users/${currentUserId}/patients/${patientId}/sessions`;
@@ -901,13 +831,60 @@
                 console.error("Error al actualizar la sesión:", error);
             }
         });
+        
+        function openDeleteConfirmationModal(patientId, patientName) {
+            deletePatientNameConfirmEl.textContent = patientName;
+            confirmDeletePatientBtn.dataset.patientId = patientId;
+            deletePatientModal.classList.remove('hidden');
+        }
+
+        cancelDeletePatientBtn.addEventListener('click', () => {
+            deletePatientModal.classList.add('hidden');
+        });
+
+        confirmDeletePatientBtn.addEventListener('click', async (e) => {
+            const patientId = e.currentTarget.dataset.patientId;
+            await deletePatient(patientId);
+        });
+
+        async function deletePatient(patientId) {
+            if (!currentUserId || !patientId) return;
+
+            try {
+                // 1. Delete all sessions in the sub-collection
+                const sessionsPath = `/artifacts/${appId}/users/${currentUserId}/patients/${patientId}/sessions`;
+                const sessionsQuery = query(collection(db, sessionsPath));
+                const sessionsSnapshot = await getDocs(sessionsQuery);
+                const deleteSessionPromises = [];
+                sessionsSnapshot.forEach((doc) => {
+                    deleteSessionPromises.push(deleteDoc(doc.ref));
+                });
+                await Promise.all(deleteSessionPromises);
+
+                // 2. Delete all appointments from the root collection
+                const appointmentsPath = `/artifacts/${appId}/users/${currentUserId}/appointments`;
+                const appointmentsQuery = query(collection(db, appointmentsPath), where("patientId", "==", patientId));
+                const appointmentsSnapshot = await getDocs(appointmentsQuery);
+                const deleteAppointmentPromises = [];
+                appointmentsSnapshot.forEach((doc) => {
+                    deleteAppointmentPromises.push(deleteDoc(doc.ref));
+                });
+                await Promise.all(deleteAppointmentPromises);
+
+                // 3. Delete the patient document itself
+                const patientPath = `/artifacts/${appId}/users/${currentUserId}/patients/${patientId}`;
+                await deleteDoc(doc(db, patientPath));
+
+                // 4. Close modal and navigate back
+                deletePatientModal.classList.add('hidden');
+                navigateTo('patients');
+
+            } catch (error) {
+                console.error("Error deleting patient and their data:", error);
+            }
+        }
 
     </script>
 </body>
-</html>%
-
-
-
-
-
+</html>
 
