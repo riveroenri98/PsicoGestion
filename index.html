@@ -329,9 +329,12 @@
             where
         } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Configuración de Firebase
+        // =================================================================================
+        // CONFIGURACIÓN DE FIREBASE
+        // Por favor, pega aquí el objeto de configuración que copiaste de tu proyecto.
+        // =================================================================================
         const firebaseConfig = {
-          apiKey: "AIzaSyAdYNfhfdK2tx0kbnBfLHAQwyBOZUXxtNU",
+          apiKey: "AIzaSyAdYNfhfdK2tx0kbnBfLHAQwyBQZUXxtNU",
           authDomain: "psicogestion-b1a67.firebaseapp.com",
           projectId: "psicogestion-b1a67",
           storageBucket: "psicogestion-b1a67.appspot.com",
@@ -339,8 +342,9 @@
           appId: "1:634430432590:web:14da1cb59e73cbb6052a1f",
           measurementId: "G-SQQYDERLCR"
         };
+        // =================================================================================
         
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const appId = 'psicogestion-app'; // Un ID simple para la app
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
@@ -901,7 +905,6 @@
     </script>
 </body>
 </html>
-
 
 
 
