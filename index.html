@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PsicoGestión - Tu Asistente Digital</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .modal-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 0.5rem;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+        .calendar-day.has-session {
+            position: relative;
+        }
+        .calendar-day.has-session::after {
+            content: '';
+            position: absolute;
+            bottom: 6px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background-color: #3b82f6; /* blue-500 */
+        }
+        .calendar-day.today {
+            background-color: #3b82f6;
+            color: white;
+            border-radius: 50%;
+        }
+         .calendar-day.selected {
+            background-color: #1d4ed8; /* blue-700 */
+            color: white;
+            border-radius: 50%;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+    <!-- Vista de Inicio de Sesión -->
+    <div id="auth-container" class="min-h-screen flex items-center justify-center bg-gray-100">
+        <div class="max-w-md w-full bg-white p-8 rounded-xl shadow-lg">
+            <div class="text-center mb-8">
+                <svg class="mx-auto h-12 w-auto text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0121 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0112 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 013 12c0-1.605.42-3.113 1.157-4.418" />
+                </svg>
+                <h2 class="mt-6 text-3xl font-bold text-gray-900">PsicoGestión</h2>
+                <p class="mt-2 text-sm text-gray-600">Tu espacio seguro para la gestión de pacientes</p>
+            </div>
+            <form id="login-form" class="space-y-6">
+                <div>
+                    <label for="email" class="text-sm font-medium text-gray-700">Correo Electrónico</label>
+                    <input id="email" name="email" type="email" autocomplete="email" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                </div>
+                <div>
+                    <label for="password" class="text-sm font-medium text-gray-700">Contraseña</label>
+                    <input id="password" name="password" type="password" autocomplete="current-password" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                </div>
+                <div id="auth-error" class="text-red-600 text-sm hidden"></div>
+                <div class="flex items-center justify-between gap-4">
+                    <button type="submit" id="login-btn" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        Iniciar Sesión
+                    </button>
+                    <button type="button" id="register-btn" class="w-full flex justify-center py-2 px-4 border border-blue-600 rounded-md shadow-sm text-sm font-medium text-blue-600 bg-white hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        Registrarse
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Vista Principal de la Aplicación -->
+    <div id="app-container" class="hidden">
+        <div class="flex h-screen bg-gray-100">
+            <!-- Barra Lateral -->
+            <aside class="w-64 bg-white shadow-md flex flex-col">
+                <div class="p-4 border-b flex items-center">
+                    <svg class="mx-auto h-12 w-auto text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0121 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0112 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 013 12c0-1.605.42-3.113 1.157-4.418" />
+                    </svg>
+                    <h1 class="text-xl font-bold ml-2">PsicoGestión</h1>
+                </div>
+                <nav class="flex-1 p-4 space-y-2">
+                    <a href="#" id="nav-dashboard" class="nav-link flex items-center px-4 py-2 text-gray-700 bg-gray-200 rounded-md">
+                        <svg class="h-5 w-5 mr-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+                        Inicio
+                    </a>
+                    <a href="#" id="nav-calendar" class="nav-link flex items-center px-4 py-2 text-gray-700 hover:bg-gray-200 rounded-md">
+                        <svg class="h-5 w-5 mr-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                        Agenda
+                    </a>
+                    <a href="#" id="nav-patients" class="nav-link flex items-center px-4 py-2 text-gray-700 hover:bg-gray-200 rounded-md">
+                        <svg class="h-5 w-5 mr-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                        Pacientes
+                    </a>
+                </nav>
+                <div class="p-4 border-t">
+                     <button id="logout-btn" class="w-full flex items-center justify-center px-4 py-2 text-gray-700 hover:bg-red-100 hover:text-red-700 rounded-md">
+                        <svg class="h-5 w-5 mr-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
+                        Cerrar Sesión
+                    </button>
+                </div>
+            </aside>
+            
+            <!-- Contenido Principal -->
+            <main class="flex-1 p-6 overflow-y-auto">
+                <!-- Vista de Inicio/Dashboard -->
+                <div id="dashboard-view">
+                    <h2 class="text-3xl font-bold mb-6">Bienvenida</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="bg-white p-6 rounded-lg shadow">
+                            <h3 class="text-xl font-semibold mb-4">Próximas Sesiones</h3>
+                            <div id="upcoming-sessions-list" class="space-y-3">
+                                <!-- Las sesiones se cargarán aquí -->
+                                <p class="text-gray-500">No hay sesiones programadas para hoy.</p>
+                            </div>
+                        </div>
+                        <div class="bg-white p-6 rounded-lg shadow">
+                            <h3 class="text-xl font-semibold mb-4">Resumen</h3>
+                            <div class="flex items-center space-x-4">
+                               <div class="p-3 bg-blue-100 rounded-full">
+                                    <svg class="h-6 w-6 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                               </div>
+                               <div>
+                                   <p class="text-gray-600">Total de Pacientes</p>
+                                   <p id="patient-count" class="text-2xl font-bold">0</p>
+                               </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Vista de Agenda/Calendario -->
+                <div id="calendar-view" class="hidden">
+                    <h2 class="text-3xl font-bold mb-6">Agenda</h2>
+                    <div class="bg-white p-6 rounded-lg shadow">
+                        <div class="flex items-center justify-between mb-4">
+                            <button id="prev-month-btn" class="p-2 rounded-full hover:bg-gray-100">
+                                <svg class="h-6 w-6 text-gray-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
+                            </button>
+                            <h3 id="calendar-month-year" class="text-xl font-semibold"></h3>
+                            <button id="next-month-btn" class="p-2 rounded-full hover:bg-gray-100">
+                                <svg class="h-6 w-6 text-gray-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+                            </button>
+                        </div>
+                        <div class="grid grid-cols-7 gap-2 text-center text-sm text-gray-500 mb-2">
+                            <div>Lun</div><div>Mar</div><div>Mié</div><div>Jue</div><div>Vie</div><div>Sáb</div><div>Dom</div>
+                        </div>
+                        <div id="calendar-days-grid" class="grid grid-cols-7 gap-2">
+                            <!-- Los días del calendario se generarán aquí -->
+                        </div>
+                    </div>
+                    <div id="selected-day-sessions" class="mt-6">
+                        <!-- Las sesiones del día seleccionado se mostrarán aquí -->
+                    </div>
+                </div>
+
+
+                <!-- Vista de Pacientes -->
+                <div id="patients-view" class="hidden">
+                     <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-3xl font-bold">Mis Pacientes</h2>
+                        <button id="add-patient-btn" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 flex items-center">
+                            <svg class="h-5 w-5 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" /></svg>
+                            Nuevo Paciente
+                        </button>
+                    </div>
+                    <div class="mb-4">
+                        <input type="text" id="patient-search-input" placeholder="Buscar paciente por nombre..." class="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow">
+                         <div id="patient-list" class="space-y-3">
+                             <!-- La lista de pacientes se cargará aquí -->
+                             <p class="text-gray-500">Aún no has agregado pacientes.</p>
+                         </div>
+                    </div>
+                </div>
+
+                <!-- Vista de Ficha de Paciente -->
+                <div id="patient-detail-view" class="hidden">
+                    <!-- El contenido se generará dinámicamente -->
+                </div>
+            </main>
+        </div>
+    </div>
+    
+    <!-- Modal para Agregar Paciente -->
+    <div id="add-patient-modal" class="modal-backdrop hidden">
+        <div class="modal-content">
+            <h3 class="text-xl font-semibold mb-4">Agregar Nuevo Paciente</h3>
+            <form id="add-patient-form">
+                <div class="space-y-4">
+                    <div>
+                        <label for="patient-name" class="block text-sm font-medium text-gray-700">Nombre Completo</label>
+                        <input type="text" id="patient-name" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                    <div>
+                        <label for="patient-email" class="block text-sm font-medium text-gray-700">Correo Electrónico (opcional)</label>
+                        <input type="email" id="patient-email" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                     <div>
+                        <label for="patient-phone" class="block text-sm font-medium text-gray-700">Teléfono (opcional)</label>
+                        <input type="tel" id="patient-phone" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                </div>
+                <div class="mt-6 flex justify-end gap-3">
+                    <button type="button" id="cancel-add-patient" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-300">Cancelar</button>
+                    <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal para Agregar Sesión -->
+    <div id="add-session-modal" class="modal-backdrop hidden">
+        <div class="modal-content">
+            <h3 class="text-xl font-semibold mb-4">Registrar Nueva Sesión</h3>
+            <form id="add-session-form">
+                <input type="hidden" id="session-patient-id">
+                <div class="space-y-4">
+                    <div>
+                        <label for="session-date" class="block text-sm font-medium text-gray-700">Fecha de la Sesión</label>
+                        <input type="datetime-local" id="session-date" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                    <div>
+                        <label for="session-notes" class="block text-sm font-medium text-gray-700">Notas de la Sesión</label>
+                        <textarea id="session-notes" rows="8" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500"></textarea>
+                    </div>
+                </div>
+                <div class="mt-6 flex justify-end gap-3">
+                    <button type="button" id="cancel-add-session" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-300">Cancelar</button>
+                    <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">Guardar Sesión</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal para Editar Sesión -->
+    <div id="edit-session-modal" class="modal-backdrop hidden">
+        <div class="modal-content">
+            <h3 class="text-xl font-semibold mb-4">Editar Sesión</h3>
+            <form id="edit-session-form">
+                <input type="hidden" id="edit-session-patient-id">
+                <input type="hidden" id="edit-session-id">
+                <input type="hidden" id="edit-session-original-date">
+                <div class="space-y-4">
+                    <div>
+                        <label for="edit-session-date" class="block text-sm font-medium text-gray-700">Fecha de la Sesión</label>
+                        <input type="datetime-local" id="edit-session-date" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                    <div>
+                        <label for="edit-session-notes" class="block text-sm font-medium text-gray-700">Notas de la Sesión</label>
+                        <textarea id="edit-session-notes" rows="8" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500"></textarea>
+                    </div>
+                </div>
+                <div class="mt-6 flex justify-end gap-3">
+                    <button type="button" id="cancel-edit-session" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-300">Cancelar</button>
+                    <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">Guardar Cambios</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+    <script type="module">
+        // Importaciones de Firebase
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { 
+            getAuth, 
+            createUserWithEmailAndPassword, 
+            signInWithEmailAndPassword, 
+            signOut, 
+            onAuthStateChanged,
+            signInAnonymously,
+            signInWithCustomToken
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { 
+            getFirestore,
+            collection,
+            addDoc,
+            doc,
+            getDoc,
+            getDocs,
+            onSnapshot,
+            query,
+            orderBy,
+            serverTimestamp,
+            setDoc,
+            updateDoc,
+            where
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Configuración de Firebase
+        const firebaseConfig = {
+          apiKey: "AIzaSyAdYNfhfdK2tx0kbnBfLHAQwyBOZUXxtNU",
+          authDomain: "psicogestion-b1a67.firebaseapp.com",
+          projectId: "psicogestion-b1a67",
+          storageBucket: "psicogestion-b1a67.appspot.com",
+          messagingSenderId: "634430432590",
+          appId: "1:634430432590:web:14da1cb59e73cbb6052a1f",
+          measurementId: "G-SQQYDERLCR"
+        };
+        
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // Referencias a elementos del DOM
+        const authContainer = document.getElementById('auth-container');
+        const appContainer = document.getElementById('app-container');
+        const loginForm = document.getElementById('login-form');
+        const authError = document.getElementById('auth-error');
+        const registerBtn = document.getElementById('register-btn');
+        const logoutBtn = document.getElementById('logout-btn');
+
+        const dashboardView = document.getElementById('dashboard-view');
+        const calendarView = document.getElementById('calendar-view');
+        const patientsView = document.getElementById('patients-view');
+        const patientDetailView = document.getElementById('patient-detail-view');
+        
+        const navLinks = {
+            dashboard: document.getElementById('nav-dashboard'),
+            calendar: document.getElementById('nav-calendar'),
+            patients: document.getElementById('nav-patients'),
+        };
+        
+        const patientCountEl = document.getElementById('patient-count');
+        const patientListEl = document.getElementById('patient-list');
+        const upcomingSessionsListEl = document.getElementById('upcoming-sessions-list');
+        const patientSearchInput = document.getElementById('patient-search-input');
+
+        // Calendario
+        const calendarMonthYear = document.getElementById('calendar-month-year');
+        const calendarDaysGrid = document.getElementById('calendar-days-grid');
+        const prevMonthBtn = document.getElementById('prev-month-btn');
+        const nextMonthBtn = document.getElementById('next-month-btn');
+        const selectedDaySessionsEl = document.getElementById('selected-day-sessions');
+
+        // Modales
+        const addPatientModal = document.getElementById('add-patient-modal');
+        const addPatientBtn = document.getElementById('add-patient-btn');
+        const cancelAddPatientBtn = document.getElementById('cancel-add-patient');
+        const addPatientForm = document.getElementById('add-patient-form');
+
+        const addSessionModal = document.getElementById('add-session-modal');
+        const cancelAddSessionBtn = document.getElementById('cancel-add-session');
+        const addSessionForm = document.getElementById('add-session-form');
+
+        const editSessionModal = document.getElementById('edit-session-modal');
+        const cancelEditSessionBtn = document.getElementById('cancel-edit-session');
+        const editSessionForm = document.getElementById('edit-session-form');
+
+        let currentUserId = null;
+        let patientUnsubscribe = null;
+        let sessionUnsubscribe = null;
+        let appointmentsUnsubscribe = null;
+        let calendarAppointmentsUnsubscribe = null;
+        
+        let currentDate = new Date();
+        let calendarAppointments = [];
+        let allPatients = [];
+
+        // --- Lógica de Autenticación ---
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                currentUserId = user.uid;
+                authContainer.classList.add('hidden');
+                appContainer.classList.remove('hidden');
+                setupRealtimeListeners();
+                navigateTo('dashboard');
+            } else {
+                currentUserId = null;
+                authContainer.classList.remove('hidden');
+                appContainer.classList.add('hidden');
+                cleanupListeners();
+            }
+        });
+
+        // Inicio de sesión con token si está disponible (desactivado para usar la configuración manual de Firebase)
+        /*
+        (async () => {
+            try {
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                }
+            } catch(error) {
+                console.error("Error al iniciar sesión con token personalizado:", error);
+                if (!auth.currentUser) {
+                    try {
+                        // Fallback para entornos sin token
+                    } catch (anonError) {
+                        console.error("Error de inicio de sesión anónimo:", anonError);
+                        authError.textContent = "Error de autenticación.";
+                        authError.classList.remove('hidden');
+                    }
+                }
+            }
+        })();
+        */
+
+
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = loginForm.email.value;
+            const password = loginForm.password.value;
+            try {
+                await signInWithEmailAndPassword(auth, email, password);
+                authError.classList.add('hidden');
+            } catch (error) {
+                authError.textContent = "Correo o contraseña incorrectos.";
+                authError.classList.remove('hidden');
+                console.error("Error de inicio de sesión:", error.message);
+            }
+        });
+
+        registerBtn.addEventListener('click', async () => {
+            const email = loginForm.email.value;
+            const password = loginForm.password.value;
+            if (!email || !password) {
+                authError.textContent = "Por favor, ingresa correo y contraseña para registrarte.";
+                authError.classList.remove('hidden');
+                return;
+            }
+            try {
+                await createUserWithEmailAndPassword(auth, email, password);
+                authError.classList.add('hidden');
+            } catch (error) {
+                authError.textContent = "Error al registrar. El correo puede estar en uso.";
+                authError.classList.remove('hidden');
+                console.error("Error de registro:", error.message);
+            }
+        });
+
+        logoutBtn.addEventListener('click', () => {
+            signOut(auth);
+        });
+        
+        // --- Navegación ---
+        function navigateTo(view) {
+            [dashboardView, calendarView, patientsView, patientDetailView].forEach(v => v.classList.add('hidden'));
+            Object.values(navLinks).forEach(l => l.classList.remove('bg-gray-200'));
+
+            if (view === 'dashboard') {
+                dashboardView.classList.remove('hidden');
+                navLinks.dashboard.classList.add('bg-gray-200');
+            } else if (view === 'calendar') {
+                calendarView.classList.remove('hidden');
+                navLinks.calendar.classList.add('bg-gray-200');
+                renderCalendar();
+            } else if (view === 'patients') {
+                patientsView.classList.remove('hidden');
+                navLinks.patients.classList.add('bg-gray-200');
+            } else if (view === 'patient-detail') {
+                patientDetailView.classList.remove('hidden');
+                navLinks.patients.classList.add('bg-gray-200');
+            }
+        }
+        
+        navLinks.dashboard.addEventListener('click', (e) => { e.preventDefault(); navigateTo('dashboard'); });
+        navLinks.calendar.addEventListener('click', (e) => { e.preventDefault(); navigateTo('calendar'); });
+        navLinks.patients.addEventListener('click', (e) => { e.preventDefault(); navigateTo('patients'); });
+
+
+        // --- Lógica de la Aplicación (Firestore) ---
+
+        function setupRealtimeListeners() {
+            if (!currentUserId) return;
+            
+            const patientsPath = `/artifacts/${appId}/users/${currentUserId}/patients`;
+            const patientsQuery = query(collection(db, patientsPath));
+            patientUnsubscribe = onSnapshot(patientsQuery, (snapshot) => {
+                allPatients = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                renderPatientList(filterPatients(allPatients));
+                patientCountEl.textContent = allPatients.length;
+            });
+            
+            const appointmentsPath = `/artifacts/${appId}/users/${currentUserId}/appointments`;
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const appointmentsQuery = query(collection(db, appointmentsPath), where("sessionDate", ">=", today.toISOString().split('T')[0]));
+            appointmentsUnsubscribe = onSnapshot(appointmentsQuery, (snapshot) => {
+                const appointments = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                appointments.sort((a, b) => new Date(a.sessionDate) - new Date(b.sessionDate));
+                renderUpcomingSessions(appointments);
+            });
+        }
+        
+        function cleanupListeners() {
+            if (patientUnsubscribe) patientUnsubscribe();
+            if (sessionUnsubscribe) sessionUnsubscribe();
+            if (appointmentsUnsubscribe) appointmentsUnsubscribe();
+            if (calendarAppointmentsUnsubscribe) calendarAppointmentsUnsubscribe();
+        }
+
+        // --- Renderizado ---
+
+        function filterPatients(patients) {
+            const searchTerm = patientSearchInput.value.toLowerCase();
+            if (!searchTerm) return patients;
+            return patients.filter(patient => patient.name.toLowerCase().includes(searchTerm));
+        }
+
+        patientSearchInput.addEventListener('input', () => {
+            renderPatientList(filterPatients(allPatients));
+        });
+
+        function renderPatientList(patients) {
+            patientListEl.innerHTML = '';
+            if (patients.length === 0) {
+                 if (patientSearchInput.value && allPatients.length > 0) {
+                    patientListEl.innerHTML = '<p class="text-gray-500">No se encontraron pacientes con ese nombre.</p>';
+                 } else {
+                    patientListEl.innerHTML = '<p class="text-gray-500">Aún no has agregado pacientes.</p>';
+                 }
+                return;
+            }
+            patients.forEach(patient => {
+                const patientEl = document.createElement('div');
+                patientEl.className = 'flex items-center justify-between p-3 rounded-md hover:bg-gray-100 cursor-pointer';
+                patientEl.dataset.patientId = patient.id;
+                patientEl.innerHTML = `
+                    <div>
+                        <p class="font-semibold">${patient.name}</p>
+                        <p class="text-sm text-gray-500">${patient.email || 'Sin correo'}</p>
+                    </div>
+                    <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+                `;
+                patientEl.addEventListener('click', () => showPatientDetail(patient.id));
+                patientListEl.appendChild(patientEl);
+            });
+        }
+        
+        function renderUpcomingSessions(sessions) {
+            upcomingSessionsListEl.innerHTML = '';
+            if (sessions.length === 0) {
+                upcomingSessionsListEl.innerHTML = '<p class="text-gray-500">No hay sesiones programadas.</p>';
+                return;
+            }
+            sessions.slice(0, 5).forEach(session => { // Limitar a 5 para no saturar
+                const sessionDate = new Date(session.sessionDate);
+                const sessionEl = document.createElement('div');
+                sessionEl.className = 'flex justify-between items-center p-3 bg-blue-50 rounded-md';
+                sessionEl.innerHTML = `
+                    <div>
+                        <p class="font-semibold">${session.patientName}</p>
+                        <p class="text-sm text-blue-700">${sessionDate.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' })} - ${sessionDate.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}</p>
+                    </div>
+                `;
+                upcomingSessionsListEl.appendChild(sessionEl);
+            });
+        }
+        
+        async function showPatientDetail(patientId) {
+            if (sessionUnsubscribe) sessionUnsubscribe();
+
+            const patientPath = `/artifacts/${appId}/users/${currentUserId}/patients/${patientId}`;
+            const patientDoc = await getDoc(doc(db, patientPath));
+            if (!patientDoc.exists()) {
+                console.error("Paciente no encontrado"); return;
+            }
+            const patient = { id: patientDoc.id, ...patientDoc.data() };
+            
+            patientDetailView.innerHTML = `
+                <button id="back-to-patients-btn" class="mb-4 flex items-center text-blue-600 hover:underline">
+                    <svg class="h-5 w-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
+                    Volver a la lista
+                </button>
+                <div class="bg-white p-6 rounded-lg shadow mb-6">
+                    <h2 class="text-3xl font-bold">${patient.name}</h2>
+                    <p class="text-gray-600 mt-1">${patient.email || ''}</p>
+                    <p class="text-gray-600">${patient.phone || ''}</p>
+                </div>
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-2xl font-bold">Historial de Sesiones</h3>
+                    <button id="add-session-btn-detail" data-patient-id="${patient.id}" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 flex items-center">
+                        <svg class="h-5 w-5 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" /></svg>
+                        Registrar Sesión
+                    </button>
+                </div>
+                <div id="session-list" class="space-y-4"></div>
+            `;
+            
+            document.getElementById('back-to-patients-btn').addEventListener('click', () => navigateTo('patients'));
+            document.getElementById('add-session-btn-detail').addEventListener('click', (e) => openAddSessionModal(e.currentTarget.dataset.patientId));
+            
+            navigateTo('patient-detail');
+            
+            const sessionsPath = `/artifacts/${appId}/users/${currentUserId}/patients/${patientId}/sessions`;
+            const sessionsQuery = query(collection(db, sessionsPath));
+            sessionUnsubscribe = onSnapshot(sessionsQuery, (snapshot) => {
+                const sessions = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                sessions.sort((a, b) => new Date(b.sessionDate) - new Date(a.sessionDate));
+                renderSessionList(sessions, patientId);
+            });
+        }
+        
+        function renderSessionList(sessions, patientId) {
+            const sessionListEl = document.getElementById('session-list');
+            sessionListEl.innerHTML = '';
+            if (sessions.length === 0) {
+                sessionListEl.innerHTML = '<div class="bg-white p-6 rounded-lg shadow text-center text-gray-500"><p>No hay sesiones registradas.</p></div>';
+                return;
+            }
+            sessions.forEach(session => {
+                const sessionDate = new Date(session.sessionDate);
+                const sessionEl = document.createElement('div');
+                sessionEl.className = 'bg-white p-6 rounded-lg shadow';
+                sessionEl.innerHTML = `
+                    <div class="flex justify-between items-start">
+                        <p class="font-semibold text-lg">${sessionDate.toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' })} - ${sessionDate.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}</p>
+                        <button data-session-id="${session.id}" data-patient-id="${patientId}" class="edit-session-btn p-1 text-gray-500 hover:text-blue-600 rounded-full hover:bg-gray-100">
+                            <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.5L16.732 3.732z" /></svg>
+                        </button>
+                    </div>
+                    <p class="mt-2 text-gray-700 whitespace-pre-wrap">${session.notes}</p>
+                `;
+                sessionListEl.appendChild(sessionEl);
+            });
+
+            sessionListEl.querySelectorAll('.edit-session-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const sessionId = e.currentTarget.dataset.sessionId;
+                    const patientId = e.currentTarget.dataset.patientId;
+                    openEditSessionModal(patientId, sessionId);
+                });
+            });
+        }
+
+        // --- Lógica del Calendario ---
+        function renderCalendar() {
+            if (calendarAppointmentsUnsubscribe) calendarAppointmentsUnsubscribe();
+
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth();
+
+            calendarMonthYear.textContent = new Date(year, month).toLocaleDateString('es-ES', { month: 'long', year: 'numeric' });
+            calendarDaysGrid.innerHTML = '';
+
+            const firstDayOfMonth = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+            const startingDay = (firstDayOfMonth === 0) ? 6 : firstDayOfMonth - 1;
+
+            for (let i = 0; i < startingDay; i++) {
+                calendarDaysGrid.innerHTML += `<div></div>`;
+            }
+
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dayEl = document.createElement('div');
+                dayEl.textContent = day;
+                dayEl.className = 'h-10 flex items-center justify-center cursor-pointer hover:bg-blue-100 rounded-full calendar-day';
+                dayEl.dataset.date = new Date(year, month, day).toISOString().split('T')[0];
+                
+                const today = new Date();
+                if (day === today.getDate() && month === today.getMonth() && year === today.getFullYear()) {
+                    dayEl.classList.add('today');
+                }
+
+                dayEl.addEventListener('click', (e) => {
+                    document.querySelectorAll('.calendar-day.selected').forEach(el => el.classList.remove('selected'));
+                    e.currentTarget.classList.add('selected');
+                    showSessionsForDay(e.currentTarget.dataset.date);
+                });
+                calendarDaysGrid.appendChild(dayEl);
+            }
+            
+            const startOfMonth = new Date(year, month, 1);
+            const endOfMonth = new Date(year, month + 1, 0);
+            const appointmentsPath = `/artifacts/${appId}/users/${currentUserId}/appointments`;
+            const q = query(collection(db, appointmentsPath), 
+                where('sessionDate', '>=', startOfMonth.toISOString().split('T')[0]),
+                where('sessionDate', '<=', endOfMonth.toISOString().split('T')[0] + 'T23:59:59')
+            );
+            calendarAppointmentsUnsubscribe = onSnapshot(q, (snapshot) => {
+                calendarAppointments = snapshot.docs.map(doc => doc.data());
+                updateCalendarWithAppointments();
+            });
+        }
+        
+        function updateCalendarWithAppointments() {
+            document.querySelectorAll('.calendar-day').forEach(dayEl => {
+                const date = dayEl.dataset.date;
+                if(calendarAppointments.some(app => app.sessionDate.startsWith(date))) {
+                    dayEl.classList.add('has-session');
+                } else {
+                    dayEl.classList.remove('has-session');
+                }
+            });
+        }
+        
+        function showSessionsForDay(date) {
+            const sessionsOnDay = calendarAppointments
+                .filter(app => app.sessionDate.startsWith(date))
+                .sort((a, b) => new Date(a.sessionDate) - new Date(b.sessionDate));
+                
+            selectedDaySessionsEl.innerHTML = '';
+            
+            const title = document.createElement('h4');
+            const dateObj = new Date(date + 'T00:00:00');
+            title.textContent = `Sesiones para el ${dateObj.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' })}`;
+            title.className = 'text-xl font-semibold mb-4';
+            selectedDaySessionsEl.appendChild(title);
+
+            if (sessionsOnDay.length === 0) {
+                selectedDaySessionsEl.innerHTML += '<div class="bg-white p-4 rounded-lg shadow text-gray-500">No hay sesiones este día.</div>';
+                return;
+            }
+
+            sessionsOnDay.forEach(session => {
+                const sessionDate = new Date(session.sessionDate);
+                const sessionEl = document.createElement('div');
+                sessionEl.className = 'flex justify-between items-center p-3 bg-white rounded-md shadow mb-2';
+                sessionEl.innerHTML = `
+                    <div>
+                        <p class="font-semibold">${session.patientName}</p>
+                        <p class="text-sm text-blue-700">${sessionDate.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}hs</p>
+                    </div>
+                `;
+                selectedDaySessionsEl.appendChild(sessionEl);
+            });
+        }
+
+        prevMonthBtn.addEventListener('click', () => {
+            currentDate.setMonth(currentDate.getMonth() - 1);
+            renderCalendar();
+        });
+
+        nextMonthBtn.addEventListener('click', () => {
+            currentDate.setMonth(currentDate.getMonth() + 1);
+            renderCalendar();
+        });
+        
+        // --- Lógica de Modales ---
+
+        addPatientBtn.addEventListener('click', () => addPatientModal.classList.remove('hidden'));
+        cancelAddPatientBtn.addEventListener('click', () => addPatientModal.classList.add('hidden'));
+        addPatientForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const name = document.getElementById('patient-name').value;
+            const email = document.getElementById('patient-email').value;
+            const phone = document.getElementById('patient-phone').value;
+            
+            try {
+                const patientsPath = `/artifacts/${appId}/users/${currentUserId}/patients`;
+                await addDoc(collection(db, patientsPath), { name, email, phone, createdAt: serverTimestamp() });
+                addPatientForm.reset();
+                addPatientModal.classList.add('hidden');
+            } catch (error) {
+                console.error("Error al agregar paciente:", error);
+            }
+        });
+
+        function openAddSessionModal(patientId) {
+            document.getElementById('session-patient-id').value = patientId;
+            const now = new Date();
+            now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+            document.getElementById('session-date').value = now.toISOString().slice(0, 16);
+            addSessionModal.classList.remove('hidden');
+        }
+        cancelAddSessionBtn.addEventListener('click', () => addSessionModal.classList.add('hidden'));
+        addSessionForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const patientId = document.getElementById('session-patient-id').value;
+            const sessionDate = document.getElementById('session-date').value;
+            const notes = document.getElementById('session-notes').value;
+            
+            try {
+                const sessionsPath = `/artifacts/${appId}/users/${currentUserId}/patients/${patientId}/sessions`;
+                await addDoc(collection(db, sessionsPath), { sessionDate, notes, createdAt: serverTimestamp() });
+                
+                const patientDoc = await getDoc(doc(db, `/artifacts/${appId}/users/${currentUserId}/patients/${patientId}`));
+                const patientName = patientDoc.data().name;
+                
+                const appointmentsPath = `/artifacts/${appId}/users/${currentUserId}/appointments`;
+                await addDoc(collection(db, appointmentsPath), { patientId, patientName, sessionDate });
+
+                addSessionForm.reset();
+                addSessionModal.classList.add('hidden');
+            } catch (error) {
+                console.error("Error al agregar sesión:", error);
+            }
+        });
+
+        async function openEditSessionModal(patientId, sessionId) {
+            try {
+                const sessionPath = `/artifacts/${appId}/users/${currentUserId}/patients/${patientId}/sessions/${sessionId}`;
+                const sessionDoc = await getDoc(doc(db, sessionPath));
+                if (!sessionDoc.exists()) {
+                    console.error("Sesión no encontrada");
+                    return;
+                }
+                const session = sessionDoc.data();
+
+                document.getElementById('edit-session-patient-id').value = patientId;
+                document.getElementById('edit-session-id').value = sessionId;
+                document.getElementById('edit-session-date').value = session.sessionDate;
+                document.getElementById('edit-session-original-date').value = session.sessionDate;
+                document.getElementById('edit-session-notes').value = session.notes;
+
+                editSessionModal.classList.remove('hidden');
+            } catch (error) {
+                console.error("Error al abrir modal de edición:", error);
+            }
+        }
+
+        cancelEditSessionBtn.addEventListener('click', () => editSessionModal.classList.add('hidden'));
+
+        editSessionForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const patientId = document.getElementById('edit-session-patient-id').value;
+            const sessionId = document.getElementById('edit-session-id').value;
+            const newDate = document.getElementById('edit-session-date').value;
+            const originalDate = document.getElementById('edit-session-original-date').value;
+            const newNotes = document.getElementById('edit-session-notes').value;
+
+            if (!patientId || !sessionId) {
+                console.error("Falta ID de paciente o sesión.");
+                return;
+            }
+
+            try {
+                const sessionPath = `/artifacts/${appId}/users/${currentUserId}/patients/${patientId}/sessions/${sessionId}`;
+                await updateDoc(doc(db, sessionPath), {
+                    sessionDate: newDate,
+                    notes: newNotes
+                });
+
+                if (newDate !== originalDate) {
+                    const appointmentsPath = `/artifacts/${appId}/users/${currentUserId}/appointments`;
+                    const q = query(collection(db, appointmentsPath), 
+                        where('patientId', '==', patientId),
+                        where('sessionDate', '==', originalDate)
+                    );
+                    const querySnapshot = await getDocs(q);
+                    if (!querySnapshot.empty) {
+                        const appointmentDoc = querySnapshot.docs[0];
+                        await updateDoc(appointmentDoc.ref, { sessionDate: newDate });
+                    } else {
+                        console.warn("No se encontró la cita correspondiente para actualizar.");
+                    }
+                }
+
+                editSessionForm.reset();
+                editSessionModal.classList.add('hidden');
+
+            } catch (error) {
+                console.error("Error al actualizar la sesión:", error);
+            }
+        });
+
+    </script>
+</body>
+</html>
+
+
