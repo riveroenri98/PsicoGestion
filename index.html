@@ -72,45 +72,13 @@
 </head>
 <body class="bg-gray-50 text-gray-800">
 
-    <!-- Vista de Inicio de Sesión -->
-    <div id="auth-container" class="min-h-screen flex items-center justify-center bg-gray-100">
-        <div class="max-w-md w-full bg-white p-8 rounded-xl shadow-lg">
-            <div class="text-center mb-8">
-                <svg class="mx-auto h-12 w-auto text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0121 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0112 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 013 12c0-1.605.42-3.113 1.157-4.418" />
-                </svg>
-                <h2 class="mt-6 text-3xl font-bold text-gray-900">PsicoGestión</h2>
-                <p class="mt-2 text-sm text-gray-600">Tu espacio seguro para la gestión de pacientes</p>
-            </div>
-            <form id="login-form" class="space-y-6">
-                <div>
-                    <label for="email" class="text-sm font-medium text-gray-700">Correo Electrónico</label>
-                    <input id="email" name="email" type="email" autocomplete="email" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
-                </div>
-                <div>
-                    <label for="password" class="text-sm font-medium text-gray-700">Contraseña</label>
-                    <input id="password" name="password" type="password" autocomplete="current-password" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
-                </div>
-                <div id="auth-error" class="text-red-600 text-sm hidden"></div>
-                <div class="flex items-center justify-between gap-4">
-                    <button type="submit" id="login-btn" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                        Iniciar Sesión
-                    </button>
-                    <button type="button" id="register-btn" class="w-full flex justify-center py-2 px-4 border border-blue-600 rounded-md shadow-sm text-sm font-medium text-blue-600 bg-white hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                        Registrarse
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-
     <!-- Vista Principal de la Aplicación -->
-    <div id="app-container" class="hidden">
+    <div id="app-container">
         <div class="flex h-screen bg-gray-100">
             <!-- Barra Lateral -->
             <aside class="w-64 bg-white shadow-md flex flex-col">
                 <div class="p-4 border-b flex items-center">
-                    <svg class="mx-auto h-12 w-auto text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                    <svg class="h-8 w-8 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                          <path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0121 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0112 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 013 12c0-1.605.42-3.113 1.157-4.418" />
                     </svg>
                     <h1 class="text-xl font-bold ml-2">PsicoGestión</h1>
@@ -129,12 +97,6 @@
                         Pacientes
                     </a>
                 </nav>
-                <div class="p-4 border-t">
-                     <button id="logout-btn" class="w-full flex items-center justify-center px-4 py-2 text-gray-700 hover:bg-red-100 hover:text-red-700 rounded-md">
-                        <svg class="h-5 w-5 mr-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
-                        Cerrar Sesión
-                    </button>
-                </div>
             </aside>
             
             <!-- Contenido Principal -->
@@ -302,12 +264,8 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { 
             getAuth, 
-            createUserWithEmailAndPassword, 
-            signInWithEmailAndPassword, 
-            signOut, 
             onAuthStateChanged,
-            signInAnonymously,
-            signInWithCustomToken
+            signInAnonymously
         } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { 
             getFirestore,
@@ -326,15 +284,17 @@
         } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // Configuración de Firebase
-        const firebaseConfig = {
-          apiKey: "AIzaSyAdYNfhfdK2tx0kbnBfLHAQwyBOZUXxtNU",
-          authDomain: "psicogestion-b1a67.firebaseapp.com",
-          projectId: "psicogestion-b1a67",
-          storageBucket: "psicogestion-b1a67.appspot.com",
-          messagingSenderId: "634430432590",
-          appId: "1:634430432590:web:14da1cb59e73cbb6052a1f",
-          measurementId: "G-SQQYDERLCR"
-        };
+        const firebaseConfig = typeof __firebase_config !== 'undefined' 
+            ? JSON.parse(__firebase_config) 
+            : {
+                  apiKey: "AIzaSyAdYNfhfdK2tx0kbnBfLHAQwyBOZUXxtNU",
+                  authDomain: "psicogestion-b1a67.firebaseapp.com",
+                  projectId: "psicogestion-b1a67",
+                  storageBucket: "psicogestion-b1a67.appspot.com",
+                  messagingSenderId: "634430432590",
+                  appId: "1:634430432590:web:14da1cb59e73cbb6052a1f",
+                  measurementId: "G-SQQYDERLCR"
+              };
         
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
 
@@ -343,13 +303,8 @@
         const db = getFirestore(app);
 
         // Referencias a elementos del DOM
-        const authContainer = document.getElementById('auth-container');
         const appContainer = document.getElementById('app-container');
-        const loginForm = document.getElementById('login-form');
-        const authError = document.getElementById('auth-error');
-        const registerBtn = document.getElementById('register-btn');
-        const logoutBtn = document.getElementById('logout-btn');
-
+        
         const dashboardView = document.getElementById('dashboard-view');
         const calendarView = document.getElementById('calendar-view');
         const patientsView = document.getElementById('patients-view');
@@ -401,76 +356,22 @@
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 currentUserId = user.uid;
-                authContainer.classList.add('hidden');
-                appContainer.classList.remove('hidden');
                 setupRealtimeListeners();
                 navigateTo('dashboard');
             } else {
                 currentUserId = null;
-                authContainer.classList.remove('hidden');
-                appContainer.classList.add('hidden');
                 cleanupListeners();
             }
         });
 
-        // Inicio de sesión con token si está disponible (desactivado para usar la configuración manual de Firebase)
-        /*
         (async () => {
             try {
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    await signInWithCustomToken(auth, __initial_auth_token);
-                }
-            } catch(error) {
-                console.error("Error al iniciar sesión con token personalizado:", error);
-                if (!auth.currentUser) {
-                    try {
-                        // Fallback para entornos sin token
-                    } catch (anonError) {
-                        console.error("Error de inicio de sesión anónimo:", anonError);
-                        authError.textContent = "Error de autenticación.";
-                        authError.classList.remove('hidden');
-                    }
-                }
+                await signInAnonymously(auth);
+            } catch (error) {
+                console.error("Error al iniciar sesión anónimamente:", error);
+                document.body.innerHTML = `<div class="min-h-screen flex items-center justify-center"><p class="text-red-600">Error de autenticación. Por favor, recarga la página.</p></div>`;
             }
         })();
-        */
-
-
-        loginForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const email = loginForm.email.value;
-            const password = loginForm.password.value;
-            try {
-                await signInWithEmailAndPassword(auth, email, password);
-                authError.classList.add('hidden');
-            } catch (error) {
-                authError.textContent = "Correo o contraseña incorrectos.";
-                authError.classList.remove('hidden');
-                console.error("Error de inicio de sesión:", error.message);
-            }
-        });
-
-        registerBtn.addEventListener('click', async () => {
-            const email = loginForm.email.value;
-            const password = loginForm.password.value;
-            if (!email || !password) {
-                authError.textContent = "Por favor, ingresa correo y contraseña para registrarte.";
-                authError.classList.remove('hidden');
-                return;
-            }
-            try {
-                await createUserWithEmailAndPassword(auth, email, password);
-                authError.classList.add('hidden');
-            } catch (error) {
-                authError.textContent = "Error al registrar. El correo puede estar en uso.";
-                authError.classList.remove('hidden');
-                console.error("Error de registro:", error.message);
-            }
-        });
-
-        logoutBtn.addEventListener('click', () => {
-            signOut(auth);
-        });
         
         // --- Navegación ---
         function navigateTo(view) {
@@ -888,5 +789,7 @@
     </script>
 </body>
 </html>
+
+
 
 
